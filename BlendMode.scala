@@ -3,8 +3,8 @@ package photoscala
 trait BlendMode:
   def combine(fg: Pixel, bg: Pixel): Pixel
 
-class Transparency(f: Double) extends BlendMode:
-  val factor = if f <= 0 then 0.0 else if f >= 1 then 1.0 else f
+class Transparency(factor: Double) extends BlendMode:
+  val f = if factor <= 0 then 0.0 else if factor >= 1 then 1.0 else factor
 
   // fg * f + bg * (1-f)
   def combine(fg: Pixel, bg: Pixel) = Pixel(

@@ -47,17 +47,31 @@ case class Blend(fg: Image, blendMode: BlendMode) extends Transformation:
         result.setColor(x, y, newColor)
       result
 
+case class KernelFilter(kernel: Kernel) extends Transformation:
+  def apply(image: Image): Image =
+    val pixels =
+      for
+        y <- 0 until image.height
+        x <- 0 until image.width
+      yield kernel * image.window(x, y, kernel.width, kernel.height)
+    Image(image.width, image.height, pixels.toArray)
+
 @main
 def runTransf: Unit =
   val image = Image.load("images/suika.jpg")
-  Crop(200, 500, 200, 200)(image).save("images/suika-cropped.jpg")
-  Invert(image).save("images/suika-inverted.jpg")
-  Grayscale(image).save("images/suika-grayed.jpg")
-  Colorize(Pixel.Red)(image).save("images/suika-red.jpg")
+  // Crop(200, 500, 200, 200)(image).save("images/suika-cropped.jpg")
+  // Invert(image).save("images/suika-inverted.jpg")
+  // Grayscale(image).save("images/suika-grayed.jpg")
+  // Colorize(Pixel.Red)(image).save("images/suika-red.jpg")
 
   val fg = Image.load("images/suika-cropped.jpg")
   val bg = Image.load("images/shot-cropped.jpg")
-  Blend(fg, Multiply)(bg).save("images/suika-shot-multiply-blended.jpg")
-  Blend(fg, Screen)(bg).save("images/suika-shot-screen-blended.jpg")
-  Blend(fg, Transparency(0.3))(bg).save("images/suika-shot-transparent.jpg")
-  Blend(fg, Overlay)(bg).save("images/suika-shot-overlay.jpg")
+  // Blend(fg, Multiply)(bg).save("images/suika-shot-multiply-blended.jpg")
+  // Blend(fg, Screen)(bg).save("images/suika-shot-screen-blended.jpg")
+  // Blend(fg, Transparency(0.3))(bg).save("images/suika-shot-transparent.jpg")
+  // Blend(fg, Overlay)(bg).save("images/suika-shot-overlay.jpg")
+
+  // KernelFilter(Kernel.blur)(image).save("images/suika-blurred.jpg")
+  // KernelFilter(Kernel.sharp)(image).save("images/suika-sharpened.jpg")
+  // KernelFilter(Kernel.edge)(image).save("images/suika-edge.jpg")
+  // KernelFilter(Kernel.emboss)(image).save("images/suika-embossed.jpg")

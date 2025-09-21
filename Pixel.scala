@@ -4,7 +4,10 @@ import java.awt.image.BufferedImage, BufferedImage.TYPE_INT_RGB
 import javax.imageio.ImageIO
 import java.io.File
 
-case class Pixel(r: Int, g: Int, b: Int):
+case class Pixel(private val red: Int, private val green: Int, private val blue: Int):
+  val r = Pixel.clamp(red)
+  val g = Pixel.clamp(green)
+  val b = Pixel.clamp(blue)
   assert(0 <= r && r < 256 && 0 <= g && g < 256 && 0 <= b && b < 256)
 
   // color: #12ffcb
