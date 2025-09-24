@@ -3,6 +3,7 @@ package photoscala
 import java.awt.image.BufferedImage, BufferedImage.TYPE_INT_RGB
 import javax.imageio.ImageIO
 import java.io.File
+import java.awt.Graphics
 
 class Image private (private val bufImage: BufferedImage):
   val width                              = bufImage.getWidth()
@@ -63,6 +64,8 @@ class Image private (private val bufImage: BufferedImage):
         y <- vertCoord
       yield getColor(x, y)
     Window(w, h, pixels.toList)
+
+  def draw(g: Graphics) = g.drawImage(bufImage, 0, 0, null)
 
 object Image:
   def apply(width: Int, height: Int, pixels: Array[Pixel]): Image =

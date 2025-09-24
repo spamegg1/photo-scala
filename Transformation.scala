@@ -1,7 +1,48 @@
 package photoscala
 
+import java.io.IOException
+
 trait Transformation:
   def apply(image: Image): Image
+
+object Transformation:
+  def parse(string: String): Transformation =
+    val words   = string.split(" ")
+    val command = words.head
+    command match
+      case "crop" =>
+        try Crop(words(1).toInt, words(2).toInt, words(3).toInt, words(4).toInt)
+        catch
+          case _ =>
+            println("Invalid crop command. Usage: 'crop [x] [y] [w] [h]'")
+            Noop
+      case "invert"    => Invert
+      case "grayscale" => Grayscale
+      case "colorize" =>
+        try
+          val colorHex  = words(1)
+          val colorCode = Integer.parseInt(colorHex, 16)
+          Colorize(Pixel.fromHex(colorCode))
+        catch
+          case _ =>
+            println("Invalid colorize command. Usage: 'colorize [hex]'")
+            Noop
+      case "blend" =>
+        try Blend(Image.load(words(1)), BlendMode.parse(words(2)))
+        catch
+          case _: IOException =>
+            println(s"Cannot load image ${words(1)}")
+            Noop
+          case _ =>
+            println("Invalid blend command. Usage: 'blend [path] [mode]'")
+            Noop
+      case "blur"    => KernelFilter(Kernel.blur)
+      case "sharpen" => KernelFilter(Kernel.sharp)
+      case "edge"    => KernelFilter(Kernel.edge)
+      case "emboss"  => KernelFilter(Kernel.emboss)
+      case _ =>
+        println(s"Invalid command '$command'")
+        Noop
 
 case class Crop(x: Int, y: Int, w: Int, h: Int) extends Transformation:
   def apply(image: Image) =
@@ -55,6 +96,9 @@ case class KernelFilter(kernel: Kernel) extends Transformation:
         x <- 0 until image.width
       yield kernel * image.window(x, y, kernel.width, kernel.height)
     Image(image.width, image.height, pixels.toArray)
+
+case object Noop extends Transformation:
+  override def apply(image: Image): Image = image
 
 @main
 def runTransf: Unit =
